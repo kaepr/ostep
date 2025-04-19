@@ -1,0 +1,66 @@
+#+title: Introduction
+
+* Glossary
+- Operating System :: Software which makes it easy for other programs to run,
+  allowing them to share memory, interact with devices.
+- Virtualiztion :: OS takes a **physical** resource ( such as processor, memory etc ) and transforms it to into a more general powerful easy to use virtual form.
+- System Calls :: Functionality by OS to user level programs to interact with features of the virtual machine. OS provides these in a standard library.
+
+* Introduction
+
+Simple code that loops and prints
+
+
+#+NAME: common-h-intro
+#+BEGIN_SRC C :tangle common.h
+#ifndef __common_h__
+#define __common_h__
+
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <assert.h>
+
+double GetTime() {
+    struct timeval t;
+    int rc = gettimeofday(&t, NULL);
+    assert(rc == 0);
+    return (double) t.tv_sec + (double) t.tv_usec/1e6;
+}
+
+void Spin(int howlong) {
+    double t = GetTime();
+    while ((GetTime() - t) < (double) howlong)
+	; // do nothing in loop
+}
+
+#endif // __common_h__
+#+END_SRC
+
+#+RESULTS: common-h-intro
+
+#+NAME: cpu-print
+#+BEGIN_SRC C :flags -Wall -I./include :results output
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <assert.h>
+#include "common.h"
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "usage: cpu <string>\n");
+        exit(1);
+    }
+
+    char *str = argv[1];
+    while (1) {
+        Spin(1);
+        printf("%s\n", str);
+    }
+
+    return 0;
+}
+
+#+END_SRC
+
+#+RESULTS: cpu-print
